@@ -4,23 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class ExchangeRateResponse(
     @field:SerializedName("rates")
-    val rates: Rates? = null,
+    val rates: Map<String, Double>
 
-)
-
-data class Rates(
-
-    @field:SerializedName("KES")
-    val kes: String? = null,
-
-    @field:SerializedName("NGN")
-    val ngn: String? = null,
-
-    @field:SerializedName("TZS")
-    val tzs: String? = null,
-
-    @field:SerializedName("UGX")
-    val ugx: String? = null
 )
 
 

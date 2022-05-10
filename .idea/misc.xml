@@ -3,6 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../layout/compose-model-1652000818888.xml" value="0.12037037037037036" />
+        <entry key="../../../../layout/compose-model-1652073306430.xml" value="0.1" />
+        <entry key="../../../../layout/compose-model-1652173489760.xml" value="0.275" />
+        <entry key="app/src/main/res/drawable-v24/ic_flag_ug.xml" value="0.1485" />
+        <entry key="app/src/main/res/drawable/ic_baseline_check_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_flag_ng.xml" value="0.1485" />
+        <entry key="app/src/main/res/drawable/ic_flag_tz.xml" value="0.1485" />
+        <entry key="app/src/main/res/drawable/ic_flag_ug.xml" value="0.1485" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.26766304347826086" />
       </map>
     </option>

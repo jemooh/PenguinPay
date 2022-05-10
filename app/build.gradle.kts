@@ -56,6 +56,10 @@ dependencies {
     implementation("com.google.android.material:material:1.5.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.3")
     implementation("androidx.compose.compiler:compiler:1.1.1")
+    implementation ("com.github.togisoft:jetpack_compose_country_code_picker:1.1.2")
+
+
+
 
     // Compose dependencies
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.5.0-alpha06")
