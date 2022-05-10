@@ -1,9 +1,15 @@
 package com.jkirwa.penguinpay.feature_send_money.domain.utils
 
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
+object Util {
+    fun isValidName(name: String): Boolean {
+        return name.matches("^[A-Za-z,.'-]+\$".toRegex())
+    }
 
-internal class Util {
+     fun isBinaryNumber(binary: String): Boolean {
+        return try {
+            Integer.parseInt(binary, 2) > 0
+        } catch (e: NumberFormatException) {
+            false
+        }
+    }
 }

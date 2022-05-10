@@ -1,31 +1,23 @@
 package com.jkirwa.penguinpay.feature_send_money.presentation.sendmoney
 
-import android.annotation.SuppressLint
-import androidx.cardview.widget.CardView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius.Companion.Zero
-import androidx.compose.ui.geometry.Offset.Companion.Zero
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -38,16 +30,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.togitech.ccp.data.utils.getDefaultLangCode
-import com.togitech.ccp.data.utils.getDefaultPhoneCode
 import com.jkirwa.penguinpay.R
 import com.jkirwa.penguinpay.feature_send_money.data.data_source.local.countries
 import com.jkirwa.penguinpay.feature_send_money.domain.utils.PrefixTransformation
-import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.ExchangeRatesViewModel
-import com.togitech.ccp.component.TogiCountryCodePicker
-import com.togitech.ccp.data.utils.checkPhoneNumber
-import com.togitech.ccp.data.utils.getLibCountries
+import com.jkirwa.penguinpay.feature_send_money.domain.utils.Util
+import com.jkirwa.penguinpay.feature_send_money.domain.utils.Util.isBinaryNumber
+import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.SendMoneyViewModel
 import org.koin.androidx.compose.getViewModel
 import java.lang.NumberFormatException
 
@@ -55,8 +43,8 @@ import java.lang.NumberFormatException
 @Preview
 @Composable
 fun SendMoneyScreen() {
-    val ratesViewModel = getViewModel<ExchangeRatesViewModel>()
-    val uiState = ratesViewModel.state.collectAsState().value
+    val sendViewModel = getViewModel<SendMoneyViewModel>()
+    val uiState = sendViewModel.state.collectAsState().value
     Column(
         horizontalAlignment = CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -69,9 +57,16 @@ fun SendMoneyScreen() {
         var showLastNameCheckIcon by remember { mutableStateOf(false) }
         var showFirstNameCheckIcon by remember { mutableStateOf(false) }
         var showPhoneNumberCheckIcon by remember { mutableStateOf(false) }
+        var showAmountCheckIcon by remember { mutableStateOf(false) }
         val textStatePhoneNumber = remember { mutableStateOf("") }
         val textStateFirstName = remember { mutableStateOf("") }
         val textStateLastName = remember { mutableStateOf("") }
+
+        var isErrorFirstName by rememberSaveable { mutableStateOf(false) }
+        var isErrorInvalidFirstName by rememberSaveable { mutableStateOf(false) }
+        var isErrorLastName by rememberSaveable { mutableStateOf(false) }
+        var isErrorInvalidLastName by rememberSaveable { mutableStateOf(false) }
+
 
         Text(
             text = stringResource(id = R.string.subtitle_fill_details),
@@ -89,8 +84,12 @@ fun SendMoneyScreen() {
                 .padding(end = 16.dp)
                 .padding(start = 16.dp),
             value = textStateFirstName.value,
+            isError = isErrorFirstName,
             onValueChange = { onQueryChanged ->
+                isErrorFirstName = false
+                isErrorInvalidFirstName = false
                 textStateFirstName.value = onQueryChanged
+                uiState.enteredFirstName = onQueryChanged
                 showFirstNameCheckIcon = onQueryChanged.isNotEmpty()
             },
             label = { Text(text = stringResource(id = R.string.hint_enter_first_name)) },
@@ -101,15 +100,23 @@ fun SendMoneyScreen() {
                 fontWeight = FontWeight.Normal
             ),
             trailingIcon = {
-                if (showFirstNameCheckIcon) {
+                if (showFirstNameCheckIcon && !isErrorFirstName) {
                     Icon(
                         imageVector = Icons.Rounded.Check,
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = null
                     )
+                } else if (isErrorFirstName) {
+                    Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colors.error)
                 }
             }
         )
+
+        if (isErrorFirstName) {
+            ErrorText(error = stringResource(id = R.string.error_first_name))
+        } else if (isErrorInvalidFirstName) {
+            ErrorText(error = stringResource(id = R.string.error_special_character))
+        }
 
         OutlinedTextField(
             modifier = Modifier
@@ -118,8 +125,12 @@ fun SendMoneyScreen() {
                 .padding(end = 16.dp)
                 .padding(start = 16.dp),
             value = textStateLastName.value,
+            isError = isErrorLastName,
             onValueChange = { onQueryChanged ->
+                isErrorLastName = false
+                isErrorInvalidLastName = false
                 textStateLastName.value = onQueryChanged
+                uiState.enteredLastName = onQueryChanged
                 showLastNameCheckIcon = onQueryChanged.isNotEmpty()
             },
             label = { Text(text = stringResource(id = R.string.hint_enter_last_name)) },
@@ -130,19 +141,28 @@ fun SendMoneyScreen() {
                 fontWeight = FontWeight.Normal
             ),
             trailingIcon = {
-                if (showLastNameCheckIcon) {
+                if (showLastNameCheckIcon && !isErrorLastName) {
                     Icon(
                         imageVector = Icons.Rounded.Check,
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = null
                     )
+                } else if (isErrorLastName) {
+                    Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colors.error)
                 }
             }
         )
 
+        if (isErrorLastName) {
+            ErrorText(error = stringResource(id = R.string.error_last_name))
+        } else if (isErrorInvalidLastName) {
+            ErrorText(error = stringResource(id = R.string.error_special_character))
+        }
+
 
         var expanded by remember { mutableStateOf(false) }
         var selectedCountryName by remember { mutableStateOf("") }
+        var isErrorCountry by rememberSaveable { mutableStateOf(false) }
 
         var textfieldSize by remember { mutableStateOf(Size.Zero) }
 
@@ -161,7 +181,10 @@ fun SendMoneyScreen() {
         ) {
             OutlinedTextField(
                 value = selectedCountryName,
-                onValueChange = { selectedCountryName = it },
+                onValueChange = {
+                    isErrorCountry = false
+                    selectedCountryName = it
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { expanded = !expanded }
@@ -169,6 +192,7 @@ fun SendMoneyScreen() {
                         //This value is used to assign to the DropDown the same width
                         textfieldSize = coordinates.size.toSize()
                     },
+                isError = isErrorCountry,
                 label = { Text(text = stringResource(id = R.string.hint_select_country)) },
                 textStyle = TextStyle(
                     color = Color.Black,
@@ -180,6 +204,11 @@ fun SendMoneyScreen() {
                         Modifier.clickable { expanded = !expanded })
                 }
             )
+
+            if (isErrorCountry) {
+                ErrorText(error = stringResource(id = R.string.error_country))
+            }
+
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
@@ -188,9 +217,10 @@ fun SendMoneyScreen() {
             ) {
                 countries.forEach { country ->
                     DropdownMenuItem(onClick = {
+                        isErrorCountry = false
                         selectedCountryName = country.countryName
                         expanded = false
-                        ratesViewModel.updateSelectedCountry(country = country)
+                        sendViewModel.updateSelectedCountry(country = country)
                     }) {
                         Row(
                             modifier =
@@ -221,6 +251,9 @@ fun SendMoneyScreen() {
 
         }
 
+        var isErrorPhoneNumber by rememberSaveable { mutableStateOf(false) }
+        var isErrorInvalidPhoneNumber by rememberSaveable { mutableStateOf(false) }
+
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -228,9 +261,14 @@ fun SendMoneyScreen() {
                 .padding(end = 16.dp)
                 .padding(start = 16.dp),
             value = textStatePhoneNumber.value,
+            isError = isErrorPhoneNumber,
             onValueChange = { onQueryChanged ->
+                isErrorPhoneNumber = false
+                isErrorInvalidPhoneNumber = false
                 textStatePhoneNumber.value = onQueryChanged
-                showPhoneNumberCheckIcon = onQueryChanged.isNotEmpty() && onQueryChanged.length == uiState.selectedCountry?.phoneLength
+                uiState.enteredPhoneNumber = onQueryChanged
+                showPhoneNumberCheckIcon =
+                    onQueryChanged.isNotEmpty() && onQueryChanged.length == uiState.selectedCountry?.phoneLength
             },
             label = { Text(text = stringResource(id = R.string.hint_enter_phone_number)) },
             visualTransformation = PrefixTransformation("(${uiState.selectedCountry?.countryCode}) "),
@@ -249,18 +287,27 @@ fun SendMoneyScreen() {
                 )
             },
             trailingIcon = {
-                if (showPhoneNumberCheckIcon) {
+                if (showPhoneNumberCheckIcon && !isErrorPhoneNumber) {
                     Icon(
                         imageVector = Icons.Rounded.Check,
                         tint = MaterialTheme.colors.onBackground,
                         contentDescription = null
                     )
+                } else if (isErrorPhoneNumber) {
+                    Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colors.error)
                 }
             }
         )
 
+        if (isErrorPhoneNumber) {
+            ErrorText(error = stringResource(id = R.string.error_phone_number))
+        } else if (isErrorInvalidPhoneNumber) {
+            ErrorText(error = stringResource(id = R.string.error_invalid_phone_number))
+        }
+
         val textStateAmount = remember { mutableStateOf("") }
-        var validation by remember { mutableStateOf(false) }
+        var isErrorAmount by remember { mutableStateOf(false) }
+        var isErrorInvalidAmount by remember { mutableStateOf(false) }
 
         OutlinedTextField(
             modifier = Modifier
@@ -270,11 +317,14 @@ fun SendMoneyScreen() {
                 .padding(start = 16.dp),
             value = textStateAmount.value,
             onValueChange = {
+                isErrorAmount = false
+                isErrorInvalidAmount = false
                 textStateAmount.value = it
+                showAmountCheckIcon = it.isNotEmpty()
                 try {
                     val amount = Integer.parseInt(it, 2)
                     if (amount > 0) {
-                        ratesViewModel.updateAmount(it, amount)
+                        sendViewModel.updateAmount(it, amount)
                     }
                 } catch (e: NumberFormatException) {
                     // Ignore it's handled by validation
@@ -293,14 +343,68 @@ fun SendMoneyScreen() {
                     contentDescription = "Enter Amount",
                 )
             },
-            isError = validation,
+            trailingIcon = {
+                if (showAmountCheckIcon && !isErrorAmount) {
+                    Icon(
+                        imageVector = Icons.Rounded.Check,
+                        tint = MaterialTheme.colors.onBackground,
+                        contentDescription = null
+                    )
+                } else if (isErrorAmount) {
+                    Icon(Icons.Filled.Error, "error", tint = MaterialTheme.colors.error)
+                }
+            },
+            isError = isErrorAmount,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
 
+        if (isErrorAmount) {
+            ErrorText(error = stringResource(id = R.string.error_amount))
+        } else if (isErrorInvalidAmount) {
+            ErrorText(error = stringResource(id = R.string.error_invalid_amount))
+        }
+
         AmountViewCard()
+
 
         Button(
             onClick = {
+
+                if (uiState.enteredFirstName.isEmpty()) {
+                    isErrorFirstName = true
+                }
+
+                if (!Util.isValidName(uiState.enteredFirstName)) {
+                    isErrorInvalidFirstName = true
+                }
+
+                if (uiState.enteredLastName.isEmpty()) {
+                    isErrorLastName = true
+                }
+
+                if (!Util.isValidName(uiState.enteredLastName)) {
+                    isErrorInvalidLastName = true
+                }
+
+                if (selectedCountryName.isEmpty()) {
+                    isErrorCountry = true
+                }
+
+                if (textStatePhoneNumber.value.isEmpty()) {
+                    isErrorPhoneNumber = true
+                }
+
+                if (textStatePhoneNumber.value.length != uiState.selectedCountry?.phoneLength) {
+                    isErrorInvalidPhoneNumber = true
+                }
+
+                if (uiState.amountBinary.isEmpty()) {
+                    isErrorAmount = true
+                }
+
+                if (!isBinaryNumber(textStateAmount.value)) {
+                    isErrorInvalidAmount = true
+                }
 
             },
             modifier = Modifier
@@ -313,6 +417,18 @@ fun SendMoneyScreen() {
         }
     }
 }
+
+@Composable
+fun ErrorText(error: String) {
+    Text(
+        text = error,
+        color = MaterialTheme.colors.error,
+        style = MaterialTheme.typography.caption,
+        modifier = Modifier.padding(start = 16.dp)
+    )
+}
+
+
 
 
 

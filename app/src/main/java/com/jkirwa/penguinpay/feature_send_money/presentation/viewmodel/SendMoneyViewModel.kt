@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class ExchangeRatesViewModel(private val exchangeRatesRepository: ExchangeRatesRepository) :
+class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepository) :
     ViewModel() {
     private val _state = MutableStateFlow(ExchangeRatesState())
     val state: StateFlow<ExchangeRatesState> = _state
@@ -82,6 +82,9 @@ data class ExchangeRatesState(
     var selectedCountry: Country? = null,
     var selectedRate: Double? = 0.0,
     var amountBinary: String = "",
+    var enteredFirstName: String = "",
+    var enteredLastName: String = "",
+    var enteredPhoneNumber: String = "",
     var amountToTransfer: Double = 0.0,
     val isSuccessFetchingExchangeRates: Boolean = false,
     val isFetchingExchangeRates: Boolean = false,

@@ -1,55 +1,17 @@
 package com.jkirwa.penguinpay.feature_send_money.presentation.sendmoney
 
-import android.annotation.SuppressLint
-import androidx.cardview.widget.CardView
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.Lock
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius.Companion.Zero
-import androidx.compose.ui.geometry.Offset.Companion.Zero
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.togitech.ccp.data.utils.getDefaultLangCode
-import com.togitech.ccp.data.utils.getDefaultPhoneCode
-import com.jkirwa.penguinpay.R
-import com.jkirwa.penguinpay.feature_send_money.data.data_source.local.countries
-import com.jkirwa.penguinpay.feature_send_money.domain.utils.PrefixTransformation
-import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.ExchangeRatesViewModel
-import com.togitech.ccp.component.TogiCountryCodePicker
-import com.togitech.ccp.data.utils.checkPhoneNumber
-import com.togitech.ccp.data.utils.getLibCountries
+import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.SendMoneyViewModel
 import org.koin.androidx.compose.getViewModel
-import java.lang.NumberFormatException
 
 
 @Preview
@@ -61,7 +23,12 @@ fun AmountViewCard() {
             .padding(15.dp)
             .clickable { },
     ) {
-        Column(modifier = Modifier.padding(15.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .padding(bottom = 8.dp)
+                .padding(4.dp)
+        ) {
             AmountConversionStateView()
             Spacer(Modifier.size(15.dp))
             ConvertedAmount()
@@ -71,8 +38,8 @@ fun AmountViewCard() {
 
 @Composable
 fun AmountConversionStateView() {
-    val ratesViewModel = getViewModel<ExchangeRatesViewModel>()
-    val uiState = ratesViewModel.state.collectAsState().value
+    val sendViewModel = getViewModel<SendMoneyViewModel>()
+    val uiState = sendViewModel.state.collectAsState().value
 
     if (!uiState.isSuccessFetchingExchangeRates) {
         Column(
@@ -87,7 +54,6 @@ fun AmountConversionStateView() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 16.dp)
         ) {
             Text(
                 text = "Open Exchange Rates:",
@@ -109,8 +75,8 @@ fun AmountConversionStateView() {
 
 @Composable
 fun ConvertedAmount() {
-    val ratesViewModel = getViewModel<ExchangeRatesViewModel>()
-    val uiState = ratesViewModel.state.collectAsState().value
+    val sendViewModel = getViewModel<SendMoneyViewModel>()
+    val uiState = sendViewModel.state.collectAsState().value
     val binaria: String = if (uiState.amountBinary.isEmpty()) {
         "0"
     } else {

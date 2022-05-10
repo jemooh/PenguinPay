@@ -4,7 +4,7 @@ import com.jkirwa.penguinpay.feature_send_money.data.data_source.remote.api.Exch
 import com.jkirwa.penguinpay.feature_send_money.data.repository.ExchangeRatesRepository
 import com.jkirwa.penguinpay.feature_send_money.domain.repository.ExchangeRatesRepositoryImpl
 import com.jkirwa.penguinpay.feature_send_money.domain.utils.Constants
-import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.ExchangeRatesViewModel
+import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.SendMoneyViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -23,6 +23,6 @@ val appModule = module {
     }
 
     viewModel {
-        ExchangeRatesViewModel(exchangeRatesRepository = get())
+        SendMoneyViewModel(exchangeRatesRepository = get())
     }
 }
