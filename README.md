@@ -23,14 +23,16 @@
 * Gradle
     * [Gradle Kotlin DSL](https://docs.gradle.org/current/userguide/kotlin_dsl.html)
 
-### Penguin Pay screenshots
-
-| <img src="main.jpg" height="480">
-|<img src="send.jpg" height="480">|  <img src="success.jpg" height="480">
-
 * Tests
     * [JUnit5](https://junit.org/junit5/)
     * [Spek](https://www.spekframework.org/)
     * [MockK](https://github.com/mockk/mockk)
     * [Turbine](https://github.com/cashapp/turbine)
+
+
+### Penguin Pay screenshots
+
+| <img src="main.jpg" height="480">
+|<img src="send.jpg" height="480">|  <img src="success.jpg" height="480">
+
 
