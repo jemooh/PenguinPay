@@ -4,7 +4,7 @@
     <string name="hint_enter_last_name">Enter Last Name</string>
     <string name="hint_enter_phone_number">Enter Phone Number</string>
     <string name="hint_select_country">Select Country</string>
-    <string name="subtitle_fill_details">Fill Recipient details to  send money</string>
+    <string name="subtitle_fill_details">Enter Recipient details to  send money</string>
     <string name="error_first_name">First name is required</string>
     <string name="error_last_name">Last name is required</string>
     <string name="error_special_character">Special characters not allowed</string>
