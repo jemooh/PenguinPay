@@ -15,8 +15,3 @@ buildscript {
         classpath("de.mannodermaus.gradle.plugins:android-junit5:$junit5Version")
     }
 }
-
-/*
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}*/
