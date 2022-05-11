@@ -199,6 +199,7 @@ fun SendMoneyScreen() {
             ) {
                 OutlinedTextField(
                     value = selectedCountryName,
+                    enabled = false,
                     onValueChange = {
                         isErrorCountry = false
                         selectedCountryName = it
