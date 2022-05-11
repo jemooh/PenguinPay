@@ -19,7 +19,7 @@
 * [Timber](https://github.com/JakeWharton/timber)
 
 * Architecture
-    * MVVM - Model View View Model
+    * Clean Architecture :MVVM - Model View View Model
 
 * Tests
     * [JUnit5](https://junit.org/junit5/)
