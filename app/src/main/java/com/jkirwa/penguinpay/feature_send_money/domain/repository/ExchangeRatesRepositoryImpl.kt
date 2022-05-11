@@ -25,7 +25,7 @@ internal class ExchangeRatesRepositoryImpl(
                 Result.Success(result)
             } catch (e: IOException) {
                 e.printStackTrace()
-                Result.Error(Exception("Error Occurred"))
+                Result.Error(Exception("Error Occurred fetching Exchange Rates, Check your Internet connection"))
             }
         }
     }

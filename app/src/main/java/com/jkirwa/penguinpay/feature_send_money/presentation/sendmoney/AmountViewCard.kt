@@ -41,34 +41,40 @@ fun AmountConversionStateView() {
     val sendViewModel = getViewModel<SendMoneyViewModel>()
     val uiState = sendViewModel.state.collectAsState().value
 
-    if (!uiState.isSuccessFetchingExchangeRates) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 16.dp),
-            horizontalAlignment = CenterHorizontally
-        ) {
-            CircularProgressIndicator()
+    when {
+        uiState.isFetchingExchangeRates -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 16.dp),
+                horizontalAlignment = CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+            }
         }
-    } else {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Text(
-                text = "Open Exchange Rates:",
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "1 BN = ${uiState.selectedCountry?.currencyCode} ${uiState.rates?.get(uiState.selectedCountry?.currencyCode)} ",
-                fontSize = 14.sp,
-                modifier = Modifier.padding(top = 8.dp)
-            )
-            Text(
-                text = "This rate is an estimate based on the current rate",
-                fontSize = 13.sp,
-                modifier = Modifier.padding(top = 3.dp)
-            )
+        uiState.isErrorFetchingExchangeRates -> {
+            ErrorText(uiState.errorMessage.toString())
+        }
+        else -> {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Open Exchange Rates:",
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "1 BN = ${uiState.selectedCountry?.currencyCode} ${uiState.rates?.get(uiState.selectedCountry?.currencyCode)} ",
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Text(
+                    text = "This rate is an estimate based on the current rate",
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(top = 3.dp)
+                )
+            }
         }
     }
 }

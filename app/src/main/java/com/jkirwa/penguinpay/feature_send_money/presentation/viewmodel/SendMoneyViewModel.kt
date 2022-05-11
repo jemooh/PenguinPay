@@ -32,6 +32,9 @@ class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepos
 
 
     fun fetchExchangeRate() {
+        _state.value = state.value.copy(
+            isFetchingExchangeRates = true
+        )
         getExchangeJob?.cancel()
         getExchangeJob = viewModelScope.launch(Dispatchers.IO) {
             when (val result = exchangeRatesRepository.fetchCurrentExchangeRates()) {
@@ -42,7 +45,7 @@ class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepos
                 }
                 is Result.Success -> {
                     _state.value = state.value.copy(
-                        isSuccessFetchingExchangeRates = true
+                        isSuccessFetchingExchangeRates = true, isFetchingExchangeRates = false
                     )
 
                     if (result.data.isSuccessful) {
@@ -54,7 +57,7 @@ class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepos
                 }
                 is Result.Error -> {
                     _state.value = state.value.copy(
-                        isErrorFetchingExchangeRates = true,
+                        isErrorFetchingExchangeRates = true, isFetchingExchangeRates = false,
                         errorMessage = result.exception.message.toString()
                     )
                 }
@@ -78,7 +81,8 @@ class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepos
     fun updateAmount(binaryAmount: String, amount: Int) {
         _state.value = state.value.copy(
             amountBinary = binaryAmount,
-            amountToTransfer = amount * state.value.rates?.get(state.value.selectedCountry?.currencyCode)!!
+            amountToTransfer = amount * (state.value.rates?.get(state.value.selectedCountry?.currencyCode)
+                ?: 0.0)
         )
     }
 

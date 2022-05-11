@@ -40,7 +40,6 @@ import com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel.SendMoney
 import org.koin.androidx.compose.getViewModel
 import java.lang.NumberFormatException
 
-
 @Preview
 @Composable
 fun SendMoneyScreen() {
@@ -388,61 +387,68 @@ fun SendMoneyScreen() {
 
             Button(
                 onClick = {
-                    if (uiState.enteredFirstName.isEmpty()) {
-                        isErrorFirstName = true
+
+                    when {
+                        uiState.enteredFirstName.isEmpty() -> {
+                            isErrorFirstName = true
+                        }
+
+                        !Util.isValidName(uiState.enteredFirstName) -> {
+                            isErrorInvalidFirstName = true
+                        }
+
+                        uiState.enteredLastName.isEmpty() -> {
+                            isErrorLastName = true
+                        }
+
+                        !Util.isValidName(uiState.enteredLastName) -> {
+                            isErrorInvalidLastName = true
+                        }
+
+                        selectedCountryName.isEmpty() -> {
+                            isErrorCountry = true
+                        }
+
+                        textStatePhoneNumber.value.isEmpty() -> {
+                            isErrorPhoneNumber = true
+                        }
+
+                        textStatePhoneNumber.value.length != uiState.selectedCountry?.phoneLength -> {
+                            isErrorInvalidPhoneNumber = true
+                        }
+
+                        uiState.amountBinary.isEmpty() -> {
+                            isErrorAmount = true
+                        }
+
+                        !isBinaryNumber(textStateAmount.value) -> {
+                            isErrorInvalidAmount = true
+                        }
+
+                        else -> {
+                            val paymentData = uiState.selectedCountry?.countryName?.let {
+                                PaymentData(
+                                    uiState.enteredFirstName,
+                                    uiState.enteredLastName,
+                                    uiState.selectedCountry?.countryCode + textStatePhoneNumber.value,
+                                    uiState.amountBinary,
+                                    it
+                                )
+                            }
+
+                            if (Util.isConnected(context)) {
+                                sendViewModel.postPayment(paymentData)
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "No Internet Connection",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
                     }
 
-                    if (!Util.isValidName(uiState.enteredFirstName)) {
-                        isErrorInvalidFirstName = true
-                    }
-
-                    if (uiState.enteredLastName.isEmpty()) {
-                        isErrorLastName = true
-                    }
-
-                    if (!Util.isValidName(uiState.enteredLastName)) {
-                        isErrorInvalidLastName = true
-                    }
-
-                    if (selectedCountryName.isEmpty()) {
-                        isErrorCountry = true
-                    }
-
-                    if (textStatePhoneNumber.value.isEmpty()) {
-                        isErrorPhoneNumber = true
-                    }
-
-                    if (textStatePhoneNumber.value.length != uiState.selectedCountry?.phoneLength) {
-                        isErrorInvalidPhoneNumber = true
-                    }
-
-                    if (uiState.amountBinary.isEmpty()) {
-                        isErrorAmount = true
-                    }
-
-                    if (!isBinaryNumber(textStateAmount.value)) {
-                        isErrorInvalidAmount = true
-                    }
-
-                    val paymentData = uiState.selectedCountry?.countryName?.let {
-                        PaymentData(
-                            uiState.enteredFirstName,
-                            uiState.enteredLastName,
-                            uiState.selectedCountry?.countryCode + textStatePhoneNumber.value,
-                            uiState.amountBinary,
-                            it
-                        )
-                    }
-
-                    if (Util.isConnected(context)) {
-                        sendViewModel.postPayment(paymentData)
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "No Internet Connection",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -454,6 +460,7 @@ fun SendMoneyScreen() {
 
             }
         }
+
     }
 }
 
