@@ -3,9 +3,11 @@ package com.jkirwa.penguinpay.feature_send_money.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jkirwa.penguinpay.feature_send_money.data.data_source.local.Country
+import com.jkirwa.penguinpay.feature_send_money.data.data_source.local.PaymentData
 import com.jkirwa.penguinpay.feature_send_money.data.data_source.local.countries
 import com.jkirwa.penguinpay.feature_send_money.data.repository.ExchangeRatesRepository
 import com.jkirwa.penguinpay.feature_send_money.data.data_source.remote.model.Result
+import com.jkirwa.penguinpay.feature_send_money.presentation.sendmoney.SuccessDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
@@ -14,8 +16,8 @@ import timber.log.Timber
 
 class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepository) :
     ViewModel() {
-    private val _state = MutableStateFlow(ExchangeRatesState())
-    val state: StateFlow<ExchangeRatesState> = _state
+    private val _state = MutableStateFlow(SendMoneyState())
+    val state: StateFlow<SendMoneyState> = _state
 
     private var getExchangeJob: Job? = null
 
@@ -60,6 +62,12 @@ class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepos
         }
     }
 
+    fun postPayment(paymentData: PaymentData?) {
+        _state.value = state.value.copy(
+            isSuccessPostPayment = true
+        )
+    }
+
     fun updateSelectedCountry(country: Country) {
         _state.value = state.value.copy(
             selectedCountry = country,
@@ -77,7 +85,7 @@ class SendMoneyViewModel(private val exchangeRatesRepository: ExchangeRatesRepos
 
 }
 
-data class ExchangeRatesState(
+data class SendMoneyState(
     val rates: Map<String, Double>? = emptyMap(),
     var selectedCountry: Country? = null,
     var selectedRate: Double? = 0.0,
@@ -86,6 +94,7 @@ data class ExchangeRatesState(
     var enteredLastName: String = "",
     var enteredPhoneNumber: String = "",
     var amountToTransfer: Double = 0.0,
+    val isSuccessPostPayment: Boolean = false,
     val isSuccessFetchingExchangeRates: Boolean = false,
     val isFetchingExchangeRates: Boolean = false,
     val isErrorFetchingExchangeRates: Boolean = false,

@@ -11,6 +11,7 @@
     <string name="error_phone_number">Phone number is required</string>
     <string name="error_invalid_phone_number"> Invalid Phone number</string>
     <string name="error_amount">Enter amount to send</string>
-    <string name="error_invalid_amount">Amount is not Binary </string>
+    <string name="error_invalid_amount">Must be a valid binary number</string>
     <string name="error_country">Select country</string>
+    <string name="hint_network_unavailable">No Internet Connection</string>
 </resources>
