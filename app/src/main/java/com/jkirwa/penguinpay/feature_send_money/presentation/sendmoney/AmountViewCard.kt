@@ -65,7 +65,11 @@ fun AmountConversionStateView() {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "1 BN = ${uiState.selectedCountry?.currencyCode} ${uiState.rates?.get(uiState.selectedCountry?.currencyCode)} ",
+                    text = "1 BN = ${uiState.selectedCountry?.currencyCode} ${
+                        uiState.rates?.get(
+                            uiState.selectedCountry?.currencyCode
+                        )
+                    } ",
                     fontSize = 14.sp,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -86,7 +90,7 @@ fun ConvertedAmount() {
     val binaria: String = if (uiState.amountBinary.isEmpty()) {
         "0"
     } else {
-        uiState.amountToTransfer.toString()
+        Integer.toBinaryString(uiState.amountToTransfer.toInt())
     }
 
 
